@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Man Problem Report</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Thai:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#0f172a;--panel:#1e293b;--panel2:#273449;--line:#334155;--text:#e2e8f0;--muted:#94a3b8;--accent:#2dd4bf;--onacc:#06201c}
+[data-theme=light]{--bg:#eef2f6;--panel:#fff;--panel2:#f1f5f9;--line:#d5dde6;--text:#0f172a;--muted:#64748b;--accent:#0f766e;--onacc:#fff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 'IBM Plex Sans','Noto Sans Thai','Noto Sans SC',sans-serif}
+header{background:var(--panel);border-bottom:1px solid var(--line);padding:10px 16px;position:sticky;top:0;z-index:5}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.sp{flex:1}
+h1{font-size:17px;margin:0}small,.lbl{color:var(--muted);font-size:12px}
+.btn,select,input,textarea{background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:7px;padding:6px 10px;font:inherit}
+.btn{cursor:pointer}.btn.on,.btn.pri{background:var(--accent);color:var(--onacc);border-color:var(--accent);font-weight:600}
+main{max-width:1200px;margin:0 auto;padding:12px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:12px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--c);border-radius:10px;padding:8px 12px}.card b{font-size:26px;display:block}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:12px}.cv{position:relative;height:300px}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}th{color:var(--muted);position:sticky;top:0;background:var(--panel)}
+.scroll{overflow:auto;max-height:560px}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}
+.th{width:44px;height:44px;object-fit:cover;border-radius:6px;margin:0 3px 3px 0;cursor:zoom-in;border:1px solid var(--line)}
+form{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}form label{display:grid;gap:3px;font-size:12px;color:var(--muted)}form .w{grid-column:1/-1}
+input,select,textarea{width:100%}.pv img{width:70px;height:70px;object-fit:cover;border-radius:6px;margin:6px 6px 0 0}
+#lb{position:fixed;inset:0;background:#000c;display:none;align-items:center;justify-content:center;z-index:20}#lb img{max-width:92vw;max-height:92vh;border-radius:8px}
+#msg{margin-top:8px;font-weight:600}.hidden{display:none!important}
+@media print{@page{size:A4;margin:10mm}header,.no-print,#lb{display:none!important}body{background:#fff;color:#111}.panel,.card{break-inside:avoid;border-color:#bbb}.scroll{max-height:none;overflow:visible}.cv{height:280px}}
+</style></head>
+<body>
+<header>
+ <div class="row"><div><h1 id="ttl"></h1><small id="upd"></small></div><span class="sp"></span>
+  <span class="row no-print"><button class="btn" data-l="en">EN</button><button class="btn" data-l="zh">中文</button><button class="btn" data-l="th">ไทย</button>
+  <button class="btn" id="bTheme">◐</button><button class="btn" id="bImg"></button><button class="btn" id="bCsv"></button><button class="btn" id="bPdf"></button></span></div>
+ <div class="row no-print" style="margin-top:8px"><span id="tabs" class="row"></span><span class="sp"></span>
+  <select id="fF"></select><select id="fD"></select><input type="date" id="fS" style="width:auto"><input type="date" id="fE" style="width:auto"><button class="btn" id="bReset"></button></div>
+</header>
+<main>
+ <section data-v="ov"><div class="cards" id="cards"></div>
+  <div class="grid2"><div class="panel"><b id="t1"></b><div class="cv"><canvas id="c1"></canvas></div></div><div class="panel"><b id="t2"></b><div class="cv"><canvas id="c2"></canvas></div></div></div>
+  <div class="panel"><b id="t3"></b><div class="cv"><canvas id="c3"></canvas></div></div></section>
+ <section data-v="sh" class="hidden"><div class="panel"><b id="t4"></b><div class="cv"><canvas id="c4"></canvas></div></div>
+  <div class="panel"><b id="t5"></b><div class="scroll"><table id="tShift"></table></div></div>
+  <div class="panel"><b id="t6"></b><div class="scroll"><table id="tTopSh"></table></div></div></section>
+ <section data-v="rec" class="hidden"><div class="panel"><div class="scroll"><table id="tRec"></table></div></div></section>
+ <section data-v="add" class="hidden"><div class="panel no-print"><form id="frm">
+  <label><span class="L" data-k="factory"></span><select id="aF" required></select></label>
+  <label><span class="L" data-k="time"></span><input type="datetime-local" id="aT" required></label>
+  <label><span class="L" data-k="shift"></span><input id="aS" list="dlS" required><datalist id="dlS"></datalist></label>
+  <label><span class="L" data-k="dept"></span><input id="aD" list="dlD" required><datalist id="dlD"></datalist></label>
+  <label><span class="L" data-k="model"></span><input id="aM" list="dlM" required><datalist id="dlM"></datalist></label>
+  <label><span class="L" data-k="issue"></span><input id="aI" list="dlI" required><datalist id="dlI"></datalist></label>
+  <label class="w"><span class="L" data-k="detail"></span><textarea id="aDt" rows="3"></textarea></label>
+  <label class="w"><span class="L" data-k="photos"></span><input type="file" id="aP" accept="image/*" multiple><div class="pv" id="pv"></div></label>
+  <label id="passW" class="hidden"><span class="L" data-k="pass"></span><input id="aPw" type="password"></label>
+  <div class="w"><button class="btn pri" id="bSub" type="submit"></button><div id="msg"></div></div></form></div></section>
+</main>
+<div id="lb"><img alt=""></div>
+<script>
+const API='PASTE_YOUR_WEB_APP_EXEC_URL_HERE';           // Apps Script deployment URL (…/exec)
+const NEEDS_PASS=false;                                  // true if PASS is set in Code.gs
+const FC={Saraburi:'#f59e0b',Ayutthaya:'#2dd4bf',Pinewave:'#a78bfa'},FN={Saraburi:'Terahop 5000 (Saraburi)'};
+const PAL=['#2dd4bf','#f59e0b','#a78bfa','#60a5fa','#f472b6','#34d399','#fb7185','#facc15'];
+const TX={en:{ttl:'Man Problem Report',ov:'Overview',sh:'Shift comparison',rec:'Records',add:'Add data',all:'All',factory:'Factory',dept:'Department',shift:'Shift',model:'Equipment model',time:'Adjust time',issue:'Issue found',detail:'Details',photos:'Photos (max 4)',pass:'Passcode',submit:'Submit',saved:'Saved ✓',err:'Error: ',cases:'cases',total:'Total',reset:'Reset',byModel:'Top equipment models',byDay:'Cases per day',topIssues:'Top issues',shiftDept:'Cases by shift and department',shiftTbl:'Shift × department',shiftIss:'Top 5 issues per shift',none:'No data',img:'Image',upd:'Updated',load:'Loading…',sending:'Sending…',count:'Cases'},
+ zh:{ttl:'人员问题报告',ov:'总览',sh:'班别对比',rec:'记录',add:'录入数据',all:'全部',factory:'工厂',dept:'部门',shift:'班别',model:'设备型号',time:'调整时间',issue:'发现的问题',detail:'细节',photos:'照片（最多4张）',pass:'口令',submit:'提交',saved:'已保存 ✓',err:'错误：',cases:'件',total:'合计',reset:'重置',byModel:'问题最多的设备型号',byDay:'每日件数',topIssues:'主要问题',shiftDept:'按班别与部门统计',shiftTbl:'班别 × 部门',shiftIss:'各班别前5问题',none:'暂无数据',img:'图片',upd:'更新',load:'加载中…',sending:'发送中…',count:'件数'},
+ th:{ttl:'รายงานปัญหาด้านบุคลากร',ov:'ภาพรวม',sh:'เปรียบเทียบกะ',rec:'รายการ',add:'เพิ่มข้อมูล',all:'ทั้งหมด',factory:'โรงงาน',dept:'แผนก',shift:'กะ',model:'รุ่นเครื่อง',time:'เวลาปรับ',issue:'ปัญหาที่พบ',detail:'รายละเอียด',photos:'รูปภาพ (สูงสุด 4)',pass:'รหัสผ่าน',submit:'ส่งข้อมูล',saved:'บันทึกแล้ว ✓',err:'ผิดพลาด: ',cases:'รายการ',total:'รวม',reset:'รีเซ็ต',byModel:'รุ่นเครื่องที่มีปัญหามากสุด',byDay:'จำนวนต่อวัน',topIssues:'ปัญหาที่พบบ่อย',shiftDept:'จำนวนตามกะและแผนก',shiftTbl:'กะ × แผนก',shiftIss:'5 ปัญหาอันดับต้นของแต่ละกะ',none:'ไม่มีข้อมูล',img:'รูปภาพ',upd:'อัปเดต',load:'กำลังโหลด…',sending:'กำลังส่ง…',count:'จำนวน'}};
+let lang=localStorage.getItem('lang')||'en',theme=localStorage.getItem('theme')||'dark',tab='ov',DATA=[],MAP={},CH={},imgs=[];
+const $=id=>document.getElementById(id),t=k=>TX[lang][k]||k,esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const iss=s=>lang==='th'?s:((MAP[s]||{})[lang==='zh'?'cn':'en']||s);                 // translated issue text (falls back to the Thai original)
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim(),fcol=f=>FC[f]||PAL[7];
+const count=(a,f)=>{const m=new Map();a.forEach(r=>{const k=f(r);m.set(k,(m.get(k)||0)+1)});return[...m].sort((x,y)=>y[1]-x[1])};
+function rows(){const f=$('fF').value,d=$('fD').value,s=$('fS').value,e=$('fE').value;return DATA.filter(r=>(!f||r.factory===f)&&(!d||r.dept===d)&&(!s||r.time.slice(0,10)>=s)&&(!e||r.time.slice(0,10)<=e))}
+function chart(id,cfg){if(CH[id])CH[id].destroy();const tx=css('--text'),gr=css('--line');cfg.options=Object.assign({responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{labels:{color:tx},display:cfg.legend!==false}}},cfg.options||{});
+ if(cfg.options.scales)Object.values(cfg.options.scales).forEach(s=>{s.ticks=Object.assign({color:tx},s.ticks);s.grid={color:gr}});CH[id]=new Chart($(id),cfg)}
+function chrome(){document.documentElement.dataset.theme=theme;document.documentElement.lang=lang==='zh'?'zh-CN':lang;$('ttl').textContent=t('ttl');
+ $('tabs').innerHTML=['ov','sh','rec','add'].map(k=>`<button class="btn${k===tab?' on':''}" data-t="${k}">${t(k)}</button>`).join('');
+ document.querySelectorAll('[data-l]').forEach(b=>b.classList.toggle('on',b.dataset.l===lang));
+ document.querySelectorAll('.L').forEach(e=>e.textContent=t(e.dataset.k));
+ document.querySelectorAll('[data-v]').forEach(s=>s.classList.toggle('hidden',s.dataset.v!==tab));
+ $('bImg').textContent='⛶ '+t('img');$('bCsv').textContent='⇩ CSV';$('bPdf').textContent='⎙ PDF';$('bReset').textContent=t('reset');$('bSub').textContent=t('submit');
+ $('passW').classList.toggle('hidden',!NEEDS_PASS);
+ const opt=(el,vals,lab)=>{const v=el.value;el.innerHTML=`<option value="">${lab}</option>`+vals.map(x=>`<option value="${esc(x)}">${esc(FN[x]||x)}</option>`).join('');el.value=v};
+ opt($('fF'),Object.keys(FC),t('factory')+': '+t('all'));opt($('fD'),[...new Set(DATA.map(r=>r.dept).filter(Boolean))].sort(),t('dept')+': '+t('all'));
+ const av=$('aF').value;$('aF').innerHTML=Object.keys(FC).map(x=>`<option value="${x}">${esc(FN[x]||x)}</option>`).join('');if(av)$('aF').value=av;
+ const dl=(id,k)=>$(id).innerHTML=[...new Set(DATA.map(r=>r[k]).filter(Boolean))].sort().map(x=>`<option value="${esc(x)}">`).join('');
+ dl('dlS','shift');dl('dlD','dept');dl('dlM','model');dl('dlI','issue')}
+function render(){chrome();const R=rows();Chart.defaults.font.family=getComputedStyle(document.body).fontFamily;
+ const fs=Object.keys(FC);$('cards').innerHTML=fs.map(f=>`<div class="card" style="--c:${FC[f]}"><small>${esc(FN[f]||f)}</small><b>${R.filter(r=>r.factory===f).length}</b><small>${t('cases')}</small></div>`).join('')+`<div class="card" style="--c:#64748b"><small>${t('total')}</small><b>${R.length}</b><small>${t('cases')}</small></div>`;
+ $('t1').textContent=t('byModel');$('t2').textContent=t('byDay');$('t3').textContent=t('topIssues');
+ const m=count(R,r=>r.model||'–').slice(0,10),mf={};R.forEach(r=>mf[r.model||'–']=r.factory);
+ chart('c1',{type:'bar',legend:false,data:{labels:m.map(x=>x[0]),datasets:[{data:m.map(x=>x[1]),backgroundColor:m.map(x=>fcol(mf[x[0]]))}]},options:{indexAxis:'y',scales:{x:{ticks:{precision:0}},y:{}}}});
+ const days=[...new Set(R.map(r=>r.time.slice(0,10)).filter(Boolean))].sort();
+ chart('c2',{type:'line',data:{labels:days,datasets:fs.map(f=>({label:FN[f]||f,borderColor:FC[f],backgroundColor:FC[f],tension:.25,data:days.map(d=>R.filter(r=>r.factory===f&&r.time.slice(0,10)===d).length)}))},options:{scales:{y:{ticks:{precision:0},beginAtZero:true},x:{}}}});
+ const ti=count(R,r=>iss(r.issue)||'–').slice(0,10);
+ chart('c3',{type:'bar',legend:false,data:{labels:ti.map(x=>x[0]),datasets:[{data:ti.map(x=>x[1]),backgroundColor:css('--accent')}]},options:{indexAxis:'y',scales:{x:{ticks:{precision:0}},y:{}}}});
+ $('t4').textContent=t('shiftDept');$('t5').textContent=t('shiftTbl');$('t6').textContent=t('shiftIss');
+ const sh=[...new Set(R.map(r=>r.shift||'–'))].sort(),dp=[...new Set(R.map(r=>r.dept||'–'))].sort();
+ chart('c4',{type:'bar',data:{labels:sh,datasets:dp.map((d,i)=>({label:d,backgroundColor:PAL[i%PAL.length],data:sh.map(s=>R.filter(r=>(r.shift||'–')===s&&(r.dept||'–')===d).length)}))},options:{scales:{x:{stacked:true},y:{stacked:true,ticks:{precision:0}}}}});
+ $('tShift').innerHTML=`<tr><th>${t('shift')}</th>${dp.map(d=>`<th>${esc(d)}</th>`).join('')}<th>${t('total')}</th></tr>`+(sh.map(s=>{const c=dp.map(d=>R.filter(r=>(r.shift||'–')===s&&(r.dept||'–')===d).length);return`<tr><td><b>${esc(s)}</b></td>${c.map(x=>`<td>${x}</td>`).join('')}<td><b>${c.reduce((a,b)=>a+b,0)}</b></td></tr>`}).join('')||`<tr><td>${t('none')}</td></tr>`);
+ $('tTopSh').innerHTML=`<tr><th>${t('shift')}</th><th>${t('issue')}</th><th>${t('count')}</th></tr>`+sh.map(s=>count(R.filter(r=>(r.shift||'–')===s),r=>iss(r.issue)||'–').slice(0,5).map((x,i,a)=>`<tr>${i?'':`<td rowspan="${a.length}"><b>${esc(s)}</b></td>`}<td>${esc(x[0])}</td><td>${x[1]}</td></tr>`).join('')).join('');
+ const L=[...R].sort((a,b)=>a.time<b.time?1:-1).slice(0,300);
+ $('tRec').innerHTML=`<tr><th>${t('time')}</th><th>${t('factory')}</th><th>${t('shift')}</th><th>${t('dept')}</th><th>${t('model')}</th><th>${t('issue')}</th><th>${t('detail')}</th><th>${t('photos').split(' (')[0].split('（')[0]}</th></tr>`+
+  (L.map(r=>`<tr><td>${esc(r.time.replace('T',' '))}</td><td><span class="dot" style="background:${fcol(r.factory)}"></span>${esc(FN[r.factory]||r.factory)}</td><td>${esc(r.shift)}</td><td>${esc(r.dept)}</td><td>${esc(r.model)}</td><td>${esc(iss(r.issue))}</td><td>${esc(r.detail)}</td><td>${r.photos.map(u=>`<img class="th" src="${esc(u)}" loading="lazy" alt="">`).join('')}</td></tr>`).join('')||`<tr><td colspan="8">${t('none')}</td></tr>`)}
+async function load(){$('upd').textContent=t('load');try{const j=await (await fetch(API)).json();if(!j.ok)throw j.error;DATA=j.rows;MAP=j.map;$('upd').textContent=t('upd')+': '+new Date(j.at).toLocaleString()}catch(e){$('upd').textContent=t('err')+e}render()}
+document.addEventListener('click',e=>{const l=e.target.closest('[data-l]'),b=e.target.closest('[data-t]'),i=e.target.closest('img.th');
+ if(l){lang=l.dataset.l;localStorage.setItem('lang',lang);render()}if(b){tab=b.dataset.t;render()}if(i){$('lb').firstChild.src=i.src;$('lb').style.display='flex'}if(e.target.closest('#lb'))$('lb').style.display='none'});
+$('bTheme').onclick=()=>{theme=theme==='dark'?'light':'dark';localStorage.setItem('theme',theme);render()};
+['fF','fD','fS','fE'].forEach(i=>$(i).onchange=render);$('bReset').onclick=()=>{['fF','fD','fS','fE'].forEach(i=>$(i).value='');render()};
+const saveBlob=(b,n)=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=n;a.click();URL.revokeObjectURL(a.href)};
+$('bCsv').onclick=()=>{const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"',R=rows().sort((a,b)=>a.time<b.time?-1:1);
+ const L=[['Time','Factory','Shift','Dept','Model','Issue (TH)','Issue (shown)','Detail','Photos'].map(q).join(',')].concat(R.map(r=>[r.time,r.factory,r.shift,r.dept,r.model,r.issue,iss(r.issue),r.detail,r.photos.join(' ')].map(q).join(',')));
+ saveBlob(new Blob(['\uFEFF'+L.join('\r\n')],{type:'text/csv;charset=utf-8'}),'man-problem-'+new Date().toISOString().slice(0,10)+'.csv')};
+let prev;addEventListener('beforeprint',()=>{prev=theme;theme='light';render()});addEventListener('afterprint',()=>{theme=prev||theme;render()});
+$('bPdf').onclick=()=>print();
+$('bImg').onclick=async()=>{if(!window.html2canvas)await new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';s.onload=ok;s.onerror=no;document.head.appendChild(s)});
+ const el=document.querySelector(`[data-v="${tab}"]`),c=await html2canvas(el,{backgroundColor:css('--bg'),scale:2,useCORS:true});c.toBlob(b=>saveBlob(b,'man-problem-'+tab+'.png'))};
+const shrink=f=>new Promise(ok=>{const im=new Image,u=URL.createObjectURL(f);im.onload=()=>{const s=Math.min(1,1280/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*s;c.height=im.height*s;c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+ const d=c.toDataURL('image/jpeg',.8);ok({name:f.name.replace(/\.\w+$/,'')+'.jpg',mime:'image/jpeg',b64:d.split(',')[1],prev:d});URL.revokeObjectURL(u)};im.src=u});
+$('aP').onchange=async e=>{imgs=await Promise.all([...e.target.files].slice(0,4).map(shrink));$('pv').innerHTML=imgs.map(i=>`<img src="${i.prev}" alt="">`).join('')};
+$('aT').value=new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,16);
+$('frm').onsubmit=async e=>{e.preventDefault();$('bSub').disabled=true;$('msg').textContent=t('sending');
+ try{const body={pass:$('aPw').value,factory:$('aF').value,time:$('aT').value,shift:$('aS').value,dept:$('aD').value,model:$('aM').value,issue:$('aI').value,detail:$('aDt').value,images:imgs.map(({name,mime,b64})=>({name,mime,b64}))};
+  const j=await (await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)})).json();if(!j.ok)throw j.error;
+  $('msg').textContent=t('saved');['aS','aD','aM','aI','aDt','aP'].forEach(i=>$(i).value='');imgs=[];$('pv').innerHTML='';await load()}catch(x){$('msg').textContent=t('err')+x}$('bSub').disabled=false};
+render();load();
+</script></body></html>
