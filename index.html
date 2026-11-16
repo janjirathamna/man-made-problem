@@ -53,12 +53,12 @@ form input,form select,form textarea{width:100%}header select{width:auto;max-wid
   <label class="w"><span class="L" data-k="detail"></span><textarea id="aDt" rows="3"></textarea></label>
   <label class="w"><span class="L" data-k="photos"></span><input type="file" id="aP" accept="image/*" multiple><div class="pv" id="pv"></div></label>
   <label id="passW" class="hidden"><span class="L" data-k="pass"></span><input id="aPw" type="password"></label>
-  <div class="w"><button class="btn pri" id="bSub" type="submit"></button> <button class="btn hidden" id="bCan" type="button"></button><div id="msg"></div></div></form></div></section>
+  <div class="w"><button class="btn pri" id="bSub" type="submit"></button> <button class="btn hidden" id="bCan" type="button"></button> <button class="btn hidden" id="bDelE" type="button" style="border-color:#e11d48;color:#e11d48"></button><div id="msg"></div></div></form></div></section>
 </main>
 <div id="lb"><img alt=""></div>
 <div id="dlg"><div><b id="dT"></b><input type="password" id="dP" autocomplete="new-password"><div id="dM" style="color:#f43f5e;min-height:18px"></div><div class="row"><button class="btn pri" id="dOk"></button><button class="btn" id="dNo"></button></div></div></div>
 <script>
-const API='https://docs.google.com/spreadsheets/d/1LJjW48kW94J8FFhT-DK3_UXyWKUAG0VG_MH2EYAqTM4/edit?gid=1681885837#gid=1681885837';           // Apps Script deployment URL (…/exec)
+const API='https://script.google.com/macros/s/AKfycbzqf2flkrWTGQVCYjCvOCLVFPMXzW86ioN1xZZt7j3Ydk6Up0S2ypjOcYDZVRV-TXpO4Q/exec';           // Apps Script deployment URL (…/exec)
 const NEEDS_PASS=false;                                  // true if PASS is set in Code.gs
 const FC={Saraburi:'#f59e0b',Ayutthaya:'#2dd4bf',Pinewave:'#a78bfa'},FN={Saraburi:'Terahop 5000 (Saraburi)'};
 const PAL=['#2dd4bf','#f59e0b','#a78bfa','#60a5fa','#f472b6','#34d399','#fb7185','#facc15'];
@@ -101,7 +101,7 @@ function render(){chrome();const R=rows();Chart.defaults.font.family=getComputed
  $('tTopSh').innerHTML=`<tr><th>${t('shift')}</th><th>${t('issue')}</th><th>${t('count')}</th></tr>`+sh.map(s=>count(R.filter(r=>(r.shift||'–')===s),r=>iss(r.issue)||'–').slice(0,5).map((x,i,a)=>`<tr>${i?'':`<td rowspan="${a.length}"><b>${esc(s)}</b></td>`}<td>${esc(x[0])}</td><td>${x[1]}</td></tr>`).join('')).join('');
  const L=[...R].sort((a,b)=>a.time<b.time?1:-1).slice(0,300);
  $('tRec').innerHTML=`<tr><th>${t('time')}</th><th>${t('factory')}</th><th>${t('shift')}</th><th>${t('dept')}</th><th>${t('model')}</th><th>${t('issue')}</th><th>${t('detail')}</th><th>${t('photos').split(' (')[0].split('（')[0]}</th><th class="no-print"></th></tr>`+
-  (L.map(r=>`<tr><td>${esc(r.time.replace('T',' '))}</td><td><span class="dot" style="background:${fcol(r.factory)}"></span>${esc(FN[r.factory]||r.factory)}</td><td>${esc(r.shift)}</td><td>${esc(r.dept)}</td><td>${esc(r.model)}</td><td>${esc(iss(r.issue))}</td><td>${esc(r.detail)}</td><td>${r.photos.map(u=>`<img class="th" src="${esc(u)}" loading="lazy" alt="">`).join('')}</td><td class="no-print" style="white-space:nowrap"><button class="btn ib" data-ed="${esc(r.id)}">✎ ${t('edit')}</button> <button class="btn ib" data-del="${esc(r.id)}">🗑</button></td></tr>`).join('')||`<tr><td colspan="9">${t('none')}</td></tr>`)}
+  (L.map(r=>`<tr><td>${esc(r.time.replace('T',' '))}</td><td><span class="dot" style="background:${fcol(r.factory)}"></span>${esc(FN[r.factory]||r.factory)}</td><td>${esc(r.shift)}</td><td>${esc(r.dept)}</td><td>${esc(r.model)}</td><td>${esc(iss(r.issue))}</td><td>${esc(r.detail)}</td><td>${r.photos.map(u=>`<img class="th" src="${esc(u)}" loading="lazy" alt="">`).join('')}</td><td class="no-print" style="white-space:nowrap"><button class="btn ib" data-ed="${esc(r.id)}">✎ ${t('edit')}</button> <button class="btn ib" data-del="${esc(r.id)}">🗑 ${t('del')}</button></td></tr>`).join('')||`<tr><td colspan="9">${t('none')}</td></tr>`)}
 async function load(){$('upd').textContent=t('load');try{const j=await (await fetch(API)).json();if(!j.ok)throw j.error;DATA=j.rows;MAP=j.map;$('upd').textContent=t('upd')+': '+new Date(j.at).toLocaleString()}catch(e){$('upd').textContent=t('err')+e}render()}
 document.addEventListener('click',e=>{const l=e.target.closest('[data-l]'),b=e.target.closest('[data-t]'),i=e.target.closest('img.th');
  if(l){lang=l.dataset.l;localStorage.setItem('lang',lang);render()}if(b){tab=b.dataset.t;render()}if(i){$('lb').firstChild.src=i.src;$('lb').style.display='flex'}if(e.target.closest('#lb'))$('lb').style.display='none'});
@@ -129,9 +129,10 @@ function askPass(){return new Promise(ok=>{const d=$('dlg');$('dT').textContent=
 async function startEdit(id){const r=DATA.find(x=>x.id===id);if(!r)return;const pw=await askPass();if(pw===null)return;
  EPW=pw;EDIT={id,expect:{issue:r.issue,model:r.model},keep:[...r.photos]};imgs=[];tab='add';render();
  $('aF').value=r.factory;$('aF').disabled=true;$('aT').value=r.time;$('aS').value=r.shift;$('aD').value=r.dept;$('aM').value=r.model;$('aI').value=r.issue;$('aDt').value=r.detail;
- $('edb').style.display='block';$('edb').textContent='✎ '+t('editing')+' – '+r.model;$('bCan').textContent=t('cancel');$('bCan').classList.remove('hidden');$('msg').textContent='';pvRender();scrollTo(0,0)}
-function endEdit(){EDIT=null;EPW='';imgs=[];$('aF').disabled=false;['aS','aD','aM','aI','aDt','aP'].forEach(i=>$(i).value='');$('edb').style.display='none';$('bCan').classList.add('hidden');pvRender()}
+ $('edb').style.display='block';$('edb').textContent='✎ '+t('editing')+' – '+r.model;$('bCan').textContent=t('cancel');$('bCan').classList.remove('hidden');$('bDelE').textContent='🗑 '+t('del');$('bDelE').classList.remove('hidden');$('msg').textContent='';pvRender();scrollTo(0,0)}
+function endEdit(){EDIT=null;EPW='';imgs=[];$('aF').disabled=false;['aS','aD','aM','aI','aDt','aP'].forEach(i=>$(i).value='');$('edb').style.display='none';$('bCan').classList.add('hidden');$('bDelE').classList.add('hidden');pvRender()}
 $('bCan').onclick=endEdit;
+$('bDelE').onclick=async()=>{if(!EDIT||!confirm(t('sure')))return;try{await post({action:'delete',pass:EPW,id:EDIT.id,expect:EDIT.expect});endEdit();tab='rec';await load()}catch(x){$('msg').textContent=t('err')+x}};
 document.addEventListener('click',async e=>{const ed=e.target.closest('[data-ed]'),dl=e.target.closest('[data-del]'),rm=e.target.closest('[data-rm]');
  if(rm&&EDIT){EDIT.keep.splice(+rm.dataset.rm,1);pvRender()}
  if(ed)startEdit(ed.dataset.ed);
