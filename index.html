@@ -26,6 +26,11 @@ form input,form select,form textarea{width:100%}header select{width:auto;max-wid
 input.pw{-webkit-text-security:disc;text-security:disc}#dlg{position:fixed;inset:0;background:#000a;display:none;align-items:center;justify-content:center;z-index:30}#dlg>div{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;width:min(340px,90vw);display:grid;gap:10px}.ib{padding:3px 8px}.edb{background:var(--accent);color:var(--onacc);border-radius:7px;padding:6px 10px;font-weight:600;display:none;margin-bottom:8px}.rm{position:relative;display:inline-block}.rm b{position:absolute;top:-4px;right:-2px;background:#e11d48;color:#fff;border-radius:50%;width:16px;height:16px;font-size:11px;text-align:center;line-height:16px;cursor:pointer}#lb{position:fixed;inset:0;background:#000c;display:none;align-items:center;justify-content:center;z-index:20}#lb img{max-width:92vw;max-height:92vh;border-radius:8px}
 #msg{margin-top:8px;font-weight:600}.hidden{display:none!important}
 @media print{@page{size:A4;margin:10mm}header,.no-print,#lb{display:none!important}body{background:#fff;color:#111}.panel,.card{break-inside:avoid;border-color:#bbb}.scroll{max-height:none;overflow:visible}.cv{height:280px}}
+.dt{display:flex;gap:4px;align-items:center}form .dt input{flex:1;min-width:0}form .dt select{width:72px;flex:none}
+.btn.addtab{margin-left:12px;padding:6px 18px;font-weight:700;color:#fff;border:2px solid #fff3;background:linear-gradient(135deg,#f59e0b,#ef4444);box-shadow:0 0 0 0 #f59e0b99;animation:addp 2.2s infinite}
+.btn.addtab:hover{filter:brightness(1.1)}.btn.addtab.on{animation:none;outline:2px solid var(--text);outline-offset:2px;box-shadow:0 2px 10px #ef444488}
+@keyframes addp{0%{box-shadow:0 0 0 0 #f59e0b99}70%{box-shadow:0 0 0 9px #f59e0b00}100%{box-shadow:0 0 0 0 #f59e0b00}}
+@media (prefers-reduced-motion:reduce){.btn.addtab{animation:none}}
 </style></head>
 <body>
 <header>
@@ -52,11 +57,11 @@ input.pw{-webkit-text-security:disc;text-security:disc}#dlg{position:fixed;inset
     <div class="row" style="margin-top:10px"><button class="btn pri" id="iGo" disabled></button><button class="btn" id="iClr"></button><span id="iMsg" style="font-weight:600"></span></div></div></div>
   <div id="mFormW"><div class="panel no-print"><div class="edb" id="edb"></div><form id="frm" autocomplete="off">
   <label><span class="L" data-k="factory"></span><select id="aF" required></select></label>
-  <label><span class="L" data-k="time"></span><input type="datetime-local" id="aT" required></label>
-  <label><span class="L" data-k="shift"></span><input id="aS" name="f_aS_x" autocomplete="off" autocorrect="off" spellcheck="false" list="dlS" required><datalist id="dlS"></datalist></label>
-  <label><span class="L" data-k="dept"></span><input id="aD" name="f_aD_x" autocomplete="off" autocorrect="off" spellcheck="false" list="dlD" required><datalist id="dlD"></datalist></label>
-  <label><span class="L" data-k="model"></span><input id="aM" name="f_aM_x" autocomplete="off" autocorrect="off" spellcheck="false" list="dlM" required><datalist id="dlM"></datalist></label>
-  <label><span class="L" data-k="issue"></span><input id="aI" name="f_aI_x" autocomplete="off" autocorrect="off" spellcheck="false" list="dlI" required><datalist id="dlI"></datalist></label>
+  <label><span class="L" data-k="time"></span><span class="dt"><input type="date" id="aTd" required><select id="aTh" required></select><span>:</span><select id="aTm" required></select></span></label>
+  <label><span class="L" data-k="shift"></span><select id="aSs" required></select><input id="aS" name="f_aS_x" autocomplete="off" autocorrect="off" spellcheck="false" class="hidden"></label>
+  <label><span class="L" data-k="dept"></span><select id="aDs" required></select><input id="aD" name="f_aD_x" autocomplete="off" autocorrect="off" spellcheck="false" class="hidden"></label>
+  <label><span class="L" data-k="model"></span><select id="aMs" required></select><input id="aM" name="f_aM_x" autocomplete="off" autocorrect="off" spellcheck="false" class="hidden"></label>
+  <label><span class="L" data-k="issue"></span><select id="aIs" required></select><input id="aI" name="f_aI_x" autocomplete="off" autocorrect="off" spellcheck="false" class="hidden"></label>
   <label class="w"><span class="L" data-k="detail"></span><textarea id="aDt" rows="3"></textarea></label>
   <label class="w"><span class="L" data-k="photos"></span><input type="file" id="aP" accept="image/*" multiple><div class="pv" id="pv"></div></label>
   <label id="passW" class="hidden"><span class="L" data-k="pass"></span><input id="aPw" class="pw" name="pw_x" autocomplete="off" autocorrect="off" spellcheck="false"></label>
@@ -82,7 +87,7 @@ function rows(){const f=$('fF').value,d=$('fD').value,s=$('fS').value,e=$('fE').
 function chart(id,cfg){if(CH[id])CH[id].destroy();const tx=css('--text'),gr=css('--line');cfg.options=Object.assign({responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{labels:{color:tx},display:cfg.legend!==false}}},cfg.options||{});
  if(cfg.options.scales)Object.values(cfg.options.scales).forEach(s=>{s.ticks=Object.assign({color:tx},s.ticks);s.grid={color:gr}});CH[id]=new Chart($(id),cfg)}
 function chrome(){document.documentElement.dataset.theme=theme;document.documentElement.lang=lang==='zh'?'zh-CN':lang;$('ttl').textContent=t('ttl');
- $('tabs').innerHTML=['ov','sh','rec','add'].map(k=>`<button class="btn${k===tab?' on':''}" data-t="${k}">${t(k)}</button>`).join('');
+ $('tabs').innerHTML=['ov','sh','rec','add'].map(k=>`<button class="btn${k==='add'?' addtab':''}${k===tab?' on':''}" data-t="${k}">${k==='add'?'＋ ':''}${t(k)}</button>`).join('');
  document.querySelectorAll('[data-l]').forEach(b=>b.classList.toggle('on',b.dataset.l===lang));
  document.querySelectorAll('.L').forEach(e=>e.textContent=t(e.dataset.k));
  document.querySelectorAll('[data-v]').forEach(s=>s.classList.toggle('hidden',s.dataset.v!==tab));
@@ -91,8 +96,8 @@ function chrome(){document.documentElement.dataset.theme=theme;document.document
  const opt=(el,vals,lab)=>{const v=el.value;el.innerHTML=`<option value="">${lab}</option>`+vals.map(x=>`<option value="${esc(x)}">${esc(FN[x]||x)}</option>`).join('');el.value=v};
  opt($('fF'),Object.keys(FC),t('factory')+': '+t('all'));opt($('fD'),[...new Set(DATA.map(r=>r.dept).filter(Boolean))].sort(),t('dept')+': '+t('all'));
  const av=$('aF').value;$('aF').innerHTML=Object.keys(FC).map(x=>`<option value="${x}">${esc(FN[x]||x)}</option>`).join('');if(av)$('aF').value=av;
- const dl=(id,k)=>$(id).innerHTML=[...new Set(DATA.map(r=>r[k]).filter(v=>v&&!/^https?:|^www\./i.test(v)))].sort().map(x=>`<option value="${esc(x)}">`).join('');
- dl('dlS','shift');dl('dlD','dept');dl('dlM','model');dl('dlI','issue')}
+ const sopt=(id,k)=>{const vals=[...new Set(DATA.map(r=>r[k]).filter(v=>v&&!/^https?:|^www\./i.test(v)))].sort();$(id+'s').innerHTML=`<option value="">${esc(X[lang].pick)}</option>`+vals.map(x=>`<option value="${esc(x)}">${esc(k==='shift'||k==='issue'?iss(x):x)}</option>`).join('')+`<option value="__new__">${esc(X[lang].other)}</option>`};
+ sopt('aS','shift');sopt('aD','dept');sopt('aM','model');sopt('aI','issue');selSync()}
 function render(){chrome();const R=rows();Chart.defaults.font.family=getComputedStyle(document.body).fontFamily;
  const fs=Object.keys(FC);$('cards').innerHTML=fs.map(f=>`<div class="card" style="--c:${FC[f]}"><small>${esc(FN[f]||f)}</small><b>${R.filter(r=>r.factory===f).length}</b><small>${t('cases')}</small></div>`).join('')+`<div class="card" style="--c:#64748b"><small>${t('total')}</small><b>${R.length}</b><small>${t('cases')}</small></div>`;
  $('t1').textContent=t('byModel');$('t2').textContent=t('byDay');$('t3').textContent=t('topIssues');
@@ -126,7 +131,14 @@ $('bImg').onclick=async()=>{if(!window.html2canvas)await new Promise((ok,no)=>{c
 const shrink=f=>new Promise(ok=>{const im=new Image,u=URL.createObjectURL(f);im.onload=()=>{const s=Math.min(1,1280/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*s;c.height=im.height*s;c.getContext('2d').drawImage(im,0,0,c.width,c.height);
  const d=c.toDataURL('image/jpeg',.8);ok({name:f.name.replace(/\.\w+$/,'')+'.jpg',mime:'image/jpeg',b64:d.split(',')[1],prev:d});URL.revokeObjectURL(u)};im.src=u});
 $('aP').onchange=async e=>{imgs=await Promise.all([...e.target.files].slice(0,4).map(shrink));pvRender()};
-$('aT').value=new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,16);
+const X={en:{pick:'— Select —',other:'＋ Other (type new)'},zh:{pick:'— 请选择 —',other:'＋ 其他（手动输入）'},th:{pick:'— เลือก —',other:'＋ อื่นๆ (พิมพ์เอง)'}};
+const nowStr=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,16);
+const TT={get value(){const d=$('aTd').value;return d?`${d}T${$('aTh').value||'00'}:${$('aTm').value||'00'}`:''},set value(v){const m=/^(\d{4}-\d\d-\d\d)[T ](\d\d):(\d\d)/.exec(v||'');$('aTd').value=m?m[1]:'';$('aTh').value=m?m[2]:'';$('aTm').value=m?m[3]:''}};   // date + 24 h time (no AM/PM)
+const opts=n=>Array.from({length:n},(_,i)=>`<option>${String(i).padStart(2,'0')}</option>`).join('');$('aTh').innerHTML=opts(24);$('aTm').innerHTML=opts(60);TT.value=nowStr();
+const SF=['aS','aD','aM','aI'];
+function selSync(){SF.forEach(id=>{const i=$(id),s=$(id+'s'),v=i.value,has=[...s.options].some(o=>o.value&&o.value!=='__new__'&&o.value===v);s.value=v===''?'':(has?v:'__new__');const nw=s.value==='__new__';i.classList.toggle('hidden',!nw);i.required=nw;if(v)i.dataset.t=1})}
+SF.forEach(id=>{$(id+'s').onchange=e=>{const s=e.target,i=$(id);if(s.value==='__new__'){i.value='';i.dataset.t=1;i.classList.remove('hidden');i.required=true;i.focus()}else{i.value=s.value;i.classList.add('hidden');i.required=false}}});
+function resetForm(){$('aF').disabled=false;$('aF').selectedIndex=0;SF.forEach(id=>{$(id).value='';delete $(id).dataset.t});$('aDt').value='';$('aP').value='';imgs=[];TT.value=nowStr();selSync();pvRender()}   // clear the whole form after a save
 const post=b=>fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(b)}).then(r=>r.json()).then(j=>{if(!j.ok)throw j.error;return j});
 function pvRender(){$('pv').innerHTML=(EDIT?EDIT.keep.map((u,i)=>`<span class="rm"><img src="${esc(u)}" alt=""><b data-rm="${i}">×</b></span>`).join(''):'')+imgs.map(i=>`<img src="${i.prev}" alt="">`).join('')}
 let EDIT=null,EPW='';
@@ -136,9 +148,9 @@ function askPass(){return new Promise(ok=>{const d=$('dlg');$('dT').textContent=
  $('dNo').onclick=()=>done(null);$('dP').onkeydown=e=>{if(e.key==='Enter')$('dOk').onclick()}})}
 async function startEdit(id){const r=DATA.find(x=>x.id===id);if(!r)return;const pw=await askPass();if(pw===null)return;
  EPW=pw;EDIT={id,expect:{issue:r.issue,model:r.model},keep:[...r.photos]};imgs=[];tab='add';render();setMeth('form');
- $('aF').value=r.factory;$('aF').disabled=true;$('aT').value=r.time;$('aS').value=r.shift;$('aD').value=r.dept;$('aM').value=r.model;$('aI').value=r.issue;$('aDt').value=r.detail;
+ $('aF').value=r.factory;$('aF').disabled=true;TT.value=r.time;$('aS').value=r.shift;$('aD').value=r.dept;$('aM').value=r.model;$('aI').value=r.issue;$('aDt').value=r.detail;selSync();
  $('edb').style.display='block';$('edb').textContent='✎ '+t('editing')+' – '+r.model;$('bCan').textContent=t('cancel');$('bCan').classList.remove('hidden');$('bDelE').textContent='🗑 '+t('del');$('bDelE').classList.remove('hidden');$('msg').textContent='';pvRender();scrollTo(0,0)}
-function endEdit(){EDIT=null;EPW='';imgs=[];$('aF').disabled=false;['aS','aD','aM','aI','aDt','aP'].forEach(i=>$(i).value='');$('edb').style.display='none';$('bCan').classList.add('hidden');$('bDelE').classList.add('hidden');pvRender()}
+function endEdit(){EDIT=null;EPW='';$('edb').style.display='none';$('bCan').classList.add('hidden');$('bDelE').classList.add('hidden');resetForm()}
 $('bCan').onclick=endEdit;
 $('bDelE').onclick=async()=>{if(!EDIT||!confirm(t('sure')))return;try{await post({action:'delete',pass:EPW,id:EDIT.id,expect:EDIT.expect});endEdit();tab='rec';await load()}catch(x){$('msg').textContent=t('err')+x}};
 document.addEventListener('click',async e=>{const ed=e.target.closest('[data-ed]'),dl=e.target.closest('[data-del]'),rm=e.target.closest('[data-rm]');
@@ -148,10 +160,10 @@ document.addEventListener('click',async e=>{const ed=e.target.closest('[data-ed]
   if(!confirm(t('sure')+'\n'+r.model+' – '+iss(r.issue)))return;
   try{await post({action:'delete',pass:pw,id:r.id,expect:{issue:r.issue,model:r.model}});await load()}catch(x){alert(t('err')+x)}}});
 $('frm').onsubmit=async e=>{e.preventDefault();$('bSub').disabled=true;$('msg').textContent=t('sending');
- try{const body={pass:$('aPw').value,factory:$('aF').value,time:$('aT').value,shift:$('aS').value,dept:$('aD').value,model:$('aM').value,issue:$('aI').value,detail:$('aDt').value,images:imgs.map(({name,mime,b64})=>({name,mime,b64}))};
+ try{const body={pass:$('aPw').value,factory:$('aF').value,time:TT.value,shift:$('aS').value,dept:$('aD').value,model:$('aM').value,issue:$('aI').value,detail:$('aDt').value,images:imgs.map(({name,mime,b64})=>({name,mime,b64}))};
   if(EDIT)Object.assign(body,{action:'update',pass:EPW,id:EDIT.id,expect:EDIT.expect,keep:EDIT.keep});
   await post(body);$('msg').textContent=t('saved');
-  if(EDIT){endEdit();tab='rec'}else{['aS','aD','aM','aI','aDt','aP'].forEach(i=>$(i).value='');imgs=[];pvRender()}
+  if(EDIT){endEdit();tab='rec'}else resetForm()
   await load()}catch(x){$('msg').textContent=t('err')+x}$('bSub').disabled=false};
 const clearAuto=()=>{if(!EDIT)['aS','aD','aM','aI'].forEach(i=>{if(/^https?:|^www\./i.test($(i).value)||document.activeElement!==$(i)&&$(i).value&&!$(i).dataset.t)$(i).value=''})};   // the browser may drop a saved address into these boxes
 [200,800,2000].forEach(ms=>setTimeout(clearAuto,ms));addEventListener('pageshow',()=>setTimeout(clearAuto,100));
