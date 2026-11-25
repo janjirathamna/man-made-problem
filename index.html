@@ -27,7 +27,7 @@ input.pw{-webkit-text-security:disc;text-security:disc}#dlg{position:fixed;inset
 #msg{margin-top:8px;font-weight:600}.hidden{display:none!important}
 @media print{@page{size:A4;margin:10mm}header,.no-print,#lb{display:none!important}body{background:#fff;color:#111}.panel,.card{break-inside:avoid;border-color:#bbb}.scroll{max-height:none;overflow:visible}.cv{height:280px}}
 .dt{display:flex;gap:4px;align-items:center}form .dt input{flex:1;min-width:0}form .dt select{width:72px;flex:none}
-.btn.addtab{margin-left:12px;padding:6px 18px;font-weight:700;color:#fff;border:2px solid #fff3;background:linear-gradient(135deg,#f59e0b,#ef4444);box-shadow:0 0 0 0 #f59e0b99;animation:addp 2.2s infinite}
+.btn.addtab{margin-right:12px;padding:6px 18px;font-weight:700;color:#fff;border:2px solid #fff3;background:linear-gradient(135deg,#f59e0b,#ef4444);box-shadow:0 0 0 0 #f59e0b99;animation:addp 2.2s infinite}
 .btn.addtab:hover{filter:brightness(1.1)}.btn.addtab.on{animation:none;outline:2px solid var(--text);outline-offset:2px;box-shadow:0 2px 10px #ef444488}
 @keyframes addp{0%{box-shadow:0 0 0 0 #f59e0b99}70%{box-shadow:0 0 0 9px #f59e0b00}100%{box-shadow:0 0 0 0 #f59e0b00}}
 @media (prefers-reduced-motion:reduce){.btn.addtab{animation:none}}
@@ -87,7 +87,7 @@ function rows(){const f=$('fF').value,d=$('fD').value,s=$('fS').value,e=$('fE').
 function chart(id,cfg){if(CH[id])CH[id].destroy();const tx=css('--text'),gr=css('--line');cfg.options=Object.assign({responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{labels:{color:tx},display:cfg.legend!==false}}},cfg.options||{});
  if(cfg.options.scales)Object.values(cfg.options.scales).forEach(s=>{s.ticks=Object.assign({color:tx},s.ticks);s.grid={color:gr}});CH[id]=new Chart($(id),cfg)}
 function chrome(){document.documentElement.dataset.theme=theme;document.documentElement.lang=lang==='zh'?'zh-CN':lang;$('ttl').textContent=t('ttl');
- $('tabs').innerHTML=['ov','sh','rec','add'].map(k=>`<button class="btn${k==='add'?' addtab':''}${k===tab?' on':''}" data-t="${k}">${k==='add'?'＋ ':''}${t(k)}</button>`).join('');
+ $('tabs').innerHTML=['add','ov','sh','rec'].map(k=>`<button class="btn${k==='add'?' addtab':''}${k===tab?' on':''}" data-t="${k}">${k==='add'?'＋ ':''}${t(k)}</button>`).join('');
  document.querySelectorAll('[data-l]').forEach(b=>b.classList.toggle('on',b.dataset.l===lang));
  document.querySelectorAll('.L').forEach(e=>e.textContent=t(e.dataset.k));
  document.querySelectorAll('[data-v]').forEach(s=>s.classList.toggle('hidden',s.dataset.v!==tab));
